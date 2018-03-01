@@ -1,9 +1,14 @@
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Representation of a graph vertex
  */
 public class Vertex {
 	// label attached to this vertex
 	private String label;
+	
+	private Collection<Edge> edges;
 
 	/**
 	 * Construct a new vertex
@@ -15,6 +20,8 @@ public class Vertex {
 		if (label == null)
 			throw new IllegalArgumentException("null");
 		this.label = label;
+		// initialize edges list
+		edges = new ArrayList<Edge>();
 	}
 
 	/**
@@ -33,6 +40,10 @@ public class Vertex {
 	 */
 	public String toString() {
 		return label;
+	}
+	
+	public void addEdge(Edge theEdge) {
+		edges.add(theEdge);
 	}
 
 	// auto-generated: hashes on label
