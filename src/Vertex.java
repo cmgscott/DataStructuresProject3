@@ -45,6 +45,10 @@ public class Vertex {
 	public void addEdge(Edge theEdge) {
 		edges.add(theEdge);
 	}
+	
+	public Collection<Edge> getEdges() {
+		return edges;
+	}
 
 	// auto-generated: hashes on label
 	public int hashCode() {

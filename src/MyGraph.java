@@ -52,31 +52,36 @@ public class MyGraph implements Graph {
 		}
 		
 		// matrix implementation of graph builder
-		int[][] adMatrix = new int[v.size()][v.size()];
-		// initialize matrix with logical infinities;
-		for (int i = 0; i < v.size()-1; i++) {
-			for (int j = 0; j < v.size()-1; j++) {
-				adMatrix[i][j] = 0;
-			}
-		}
-		// add symmetry
-		for (int i = 0; i < v.size()-1; i++) {
-			adMatrix[i][i] = INFINITY;
-		}
-		
-		// add edges
-		for (int i = 0; i < e.size(); i++) {
-			if (v.contains(((ArrayList<Edge>) e).get(i).getSource())) {
-				int indOfSource = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getSource());
-				int indOfDest = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getDestination());
-				adMatrix[indOfSource][indOfDest] = 1;
-			}
-		}
-		
-		HashMap<Vertex, int[]> graph = new HashMap<Vertex, int[]>();
+		Map<String, Vertex> denseGraphMap = new HashMap<String, Vertex>();
 		for (int i = 0; i < v.size(); i++) {
-			graph.put(((ArrayList<Vertex>) v).get(i), adMatrix[i]);
+			currentVertex = ((ArrayList<Vertex>) v).get(i);
+			denseGraphMap.put(currentVertex.getLabel(), currentVertex);
 		}
+//		int[][] adMatrix = new int[v.size()][v.size()];
+//		// initialize matrix with logical infinities;
+//		for (int i = 0; i < v.size()-1; i++) {
+//			for (int j = 0; j < v.size()-1; j++) {
+//				adMatrix[i][j] = 0;
+//			}
+//		}
+//		// add symmetry
+//		for (int i = 0; i < v.size()-1; i++) {
+//			adMatrix[i][i] = INFINITY;
+//		}
+//		
+//		// add edges
+//		for (int i = 0; i < e.size(); i++) {
+//			if (v.contains(((ArrayList<Edge>) e).get(i).getSource())) {
+//				int indOfSource = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getSource());
+//				int indOfDest = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getDestination());
+//				adMatrix[indOfSource][indOfDest] = 1;
+//			}
+//		}
+//		
+//		HashMap<Vertex, int[]> graph = new HashMap<Vertex, int[]>();
+//		for (int i = 0; i < v.size(); i++) {
+//			graph.put(((ArrayList<Vertex>) v).get(i), adMatrix[i]);
+//		}
 		// print matrix for debugging
 //		for (int i = 0; i < v.size()-1; i++) {
 //			for (int j = 0; j < v.size()-1; j++) {
@@ -144,9 +149,12 @@ public class MyGraph implements Graph {
 	public Collection<Vertex> adjacentVertices(Vertex v) {
 
 		// YOUR CODE HERE
-		Collection<Vertex> adjacent = new LinkedList<Vertex>();
-//		for (
-		return null;
+		Collection<Edge> edges = v.getEdges();
+		Collection<Vertex> returnVertices = new ArrayList<Vertex>();
+		for (int i = 0; i < edges.size(); i++) {
+			returnVertices.add(((ArrayList<Edge>) edges).get(i).getDestination());
+		}
+		return returnVertices;
 
 	}
 
@@ -167,8 +175,14 @@ public class MyGraph implements Graph {
 	public int edgeCost(Vertex a, Vertex b) {
 
 		// YOUR CODE HERE
-		return 0;
-
+		int returnValue = -1;
+		ArrayList<Edge> edges = (ArrayList<Edge>) a.getEdges();
+		for (int i = 0; i < edges.size(); i++) {
+			if (edges.get(i).getDestination().equals(b)) {
+				returnValue = edges.get(i).getWeight();
+			}
+		}
+		return returnValue;
 	}
 
 	/**
@@ -190,8 +204,9 @@ public class MyGraph implements Graph {
 
 		// YOUR CODE HERE (you might comment this out this method while doing
 		// Part 1)
+		Vertex startingNode = a;
+		
 		return null;
 
 	}
-
 }
