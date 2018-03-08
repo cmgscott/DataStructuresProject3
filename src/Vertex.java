@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 
 /**
  * Representation of a graph vertex
@@ -9,6 +10,10 @@ public class Vertex {
 	private String label;
 	
 	private Collection<Edge> edges;
+	
+	public int pathCost;
+	
+	public Vertex lastVertex;
 
 	/**
 	 * Construct a new vertex
@@ -22,6 +27,7 @@ public class Vertex {
 		this.label = label;
 		// initialize edges list
 		edges = new ArrayList<Edge>();
+		pathCost = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -47,7 +53,7 @@ public class Vertex {
 	}
 	
 	public Collection<Edge> getEdges() {
-		return edges;
+		return edges == null ? new ArrayList<Edge>() : edges;
 	}
 
 	// auto-generated: hashes on label
@@ -56,6 +62,22 @@ public class Vertex {
 		int result = 1;
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		return result;
+	}
+	
+	public void setPathCost(int cost) {
+		pathCost = cost;
+	}
+	
+	public int getPathCost() {
+		return pathCost;
+	}
+	
+	public void setLastVertex(Vertex theVertex) {
+		lastVertex = theVertex;
+	}
+	
+	public Vertex getLastVertex() {
+		return lastVertex;
 	}
 
 	// auto-generated: compares labels

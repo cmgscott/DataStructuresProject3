@@ -54,6 +54,12 @@ public class FindPaths {
 			
 			// YOUR CODE HERE: call shortestPath and print
 			// out the result
+			Path path = g.shortestPath(a, b);
+			for (int i = 0; i < path.vertices.size(); i++) {
+				System.out.println(path.vertices.get(i).getLabel());
+			}
+			System.out.println("Path cost: " + path.cost);
+			System.out.println("finished=========================");
 		}
 	}
 

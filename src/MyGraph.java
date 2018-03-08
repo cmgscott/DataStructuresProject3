@@ -12,12 +12,12 @@ public class MyGraph implements Graph {
 	/** value of infinity **/
 	public static final int INFINITY = Integer.MAX_VALUE;
 	/** the collection of vertices **/
-	Collection<Vertex> vertices;
-	
+	ArrayList<Vertex> vertices;
+
 	/** the collection of edges **/
 	Collection<Edge> edges;
-	
-	
+
+
 
 	/**
 	 * Creates a MyGraph object with the given collection of vertices and the
@@ -31,17 +31,17 @@ public class MyGraph implements Graph {
 	public MyGraph(Collection<Vertex> v, Collection<Edge> e) {
 
 		// YOUR CODE HERE
-		vertices = v;
+		vertices = (ArrayList<Vertex>) v;
 		edges = e;
-		
+
 		// list implementation of graph builder
-		Vertex startingVertex = ((ArrayList<Vertex>) v).get(0);
+		Vertex startingVertex = vertices.get(0);
 		Vertex currentVertex = startingVertex;
 		int count = 0;
-		Collection<Vertex> visitedVertices = new ArrayList<Vertex>(v.size()); // large size req.
+		Collection<Vertex> visitedVertices = new ArrayList<Vertex>(vertices.size()); // large size req.
 		// add all edges to collection for individual vertex
-		while (count < v.size()) {
-			currentVertex = ((ArrayList<Vertex>) v).get(count);
+		while (count < vertices.size()) {
+			currentVertex = vertices.get(count);
 			for (int i = 0; i < e.size(); i++) {
 				if (((ArrayList<Edge>) e).get(i).getSource().getLabel().equals(currentVertex.getLabel())) {
 					currentVertex.addEdge(((ArrayList<Edge>) e).get(i));
@@ -50,59 +50,26 @@ public class MyGraph implements Graph {
 			}
 			count++;
 		}
-		
+
 		// matrix implementation of graph builder
 		Map<String, Vertex> denseGraphMap = new HashMap<String, Vertex>();
-		for (int i = 0; i < v.size(); i++) {
-			currentVertex = ((ArrayList<Vertex>) v).get(i);
+		for (int i = 0; i < vertices.size(); i++) {
+			currentVertex = ((ArrayList<Vertex>) vertices).get(i);
 			denseGraphMap.put(currentVertex.getLabel(), currentVertex);
 		}
-//		int[][] adMatrix = new int[v.size()][v.size()];
-//		// initialize matrix with logical infinities;
-//		for (int i = 0; i < v.size()-1; i++) {
-//			for (int j = 0; j < v.size()-1; j++) {
-//				adMatrix[i][j] = 0;
-//			}
-//		}
-//		// add symmetry
-//		for (int i = 0; i < v.size()-1; i++) {
-//			adMatrix[i][i] = INFINITY;
-//		}
-//		
-//		// add edges
-//		for (int i = 0; i < e.size(); i++) {
-//			if (v.contains(((ArrayList<Edge>) e).get(i).getSource())) {
-//				int indOfSource = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getSource());
-//				int indOfDest = ((ArrayList<Vertex>) v).indexOf(((ArrayList<Edge>)e).get(i).getDestination());
-//				adMatrix[indOfSource][indOfDest] = 1;
-//			}
-//		}
-//		
-//		HashMap<Vertex, int[]> graph = new HashMap<Vertex, int[]>();
-//		for (int i = 0; i < v.size(); i++) {
-//			graph.put(((ArrayList<Vertex>) v).get(i), adMatrix[i]);
-//		}
-		// print matrix for debugging
-//		for (int i = 0; i < v.size()-1; i++) {
-//			for (int j = 0; j < v.size()-1; j++) {
-//				System.out.print(adMatrix[i][j]);
-//				System.out.print(" ");
-//			}
-//			System.out.println();
-//		}
 		// should check that the arguments make sense and throw an appropriate exception otherwise.
-		
+
 		// edges should involve only vertices with labels that are in the vertices of the graph (no edge from or to a 
 		// vertex labeled A if there is no vertex with label A)
-		
+
 		// edge weights are not negative
-		
+
 		// do not throw an exception if the collection of vertices has repeats in it
 		// ignore the second one encountered as redundant information
-		
+
 		// throw an exception if the collection of edges has the same directed edge more than once with a different 
 		// weight
-		
+
 		// do not throw an exception if an edge appears redundantly with the same weight ignore the redundant edge 
 		// information
 
@@ -204,9 +171,61 @@ public class MyGraph implements Graph {
 
 		// YOUR CODE HERE (you might comment this out this method while doing
 		// Part 1)
-		Vertex startingNode = a;
-		
-		return null;
+		VertexComparator comparer = new VertexComparator();
+		ArrayList<Vertex> unknownVertices = new ArrayList<Vertex>();
+		List<Vertex> knownVertices = new ArrayList<Vertex>();
+		Vertex currentVertex = vertices.get(vertices.indexOf(a));
+		Edge currentEdge = new Edge(currentVertex, currentVertex, 0);
+
+		//		List<Path> paths = new ArrayList<Path>(vertices.size());
+		List<Vertex> path = new LinkedList<Vertex>();
+		int count = 0;
+		currentVertex.setPathCost(0);
+
+		for (int i = 0; i < vertices.size(); i++) {
+			if (!vertices.get(i).equals(a)) {
+				vertices.get(i).setPathCost(10000); // set path to large num to simulate infinte distance
+				unknownVertices.add(vertices.get(i)); // add vertex to unknown vertices
+			}
+		}
+		boolean quit = false;
+		while (!unknownVertices.isEmpty()) { // while there are vertices w/ unknown distances
+			if (currentVertex != null) {
+				for (int i = 0; i < currentVertex.getEdges().size(); i++) { // iterate through all the vertex's edges
+					currentEdge = ((ArrayList<Edge>) currentVertex.getEdges()).get(i);
+					int tempPath = currentVertex.getPathCost() + currentEdge.getWeight(); // the current total path cost of the vertex + the cost to the destination vertex of the edge at index i
+//					if (currentVertex.equals(a)) {
+//						currentVertex.pathCost = 0;
+//						tempPath = 0 + currentEdge.getWeight();
+//				    }
+					if (unknownVertices.indexOf(currentEdge.getDestination()) >= 0 && tempPath < unknownVertices.get(unknownVertices.indexOf(currentEdge.getDestination())).getPathCost()) { // if the temp path to the destination vertex is less than it's current path cost (initially infinity)
+						if (!currentEdge.getDestination().equals(a)) { // don't want to circle back
+							System.out.println("the temp path from " + currentVertex.getLabel() + " to " + currentEdge.getDestination() + " is: " + tempPath);
+							int indexOfDest = unknownVertices.indexOf(currentEdge.getDestination()); // index of the destination vertex
+							if (indexOfDest >= 0) { // is -1 if destination is a known vertex
+							unknownVertices.get(indexOfDest).pathCost = tempPath; // set new path cost to destination
+							unknownVertices.get(indexOfDest).lastVertex = currentVertex; // set the previous vertex in the destination vertex
+							} 
+						}
+					}
+				}
+			}
+			unknownVertices.sort(comparer); // sorts the array so that the least path is at index 0
+//			if (b.equals(currentVertex)) { // if the destination becomes a known vertex, it's path is certain
+//				break; // so the loop can end
+//			}
+			unknownVertices.remove(currentVertex); // the vertex is no longer unknown
+			knownVertices.add(currentVertex);
+			if (!unknownVertices.isEmpty())
+			currentVertex = unknownVertices.get(0); // next lowest path cost unknown vertex
+		}
+
+		currentVertex = knownVertices.get(knownVertices.indexOf(b));
+		while (currentVertex != null) { // iterate through last vertices until null (or until starting node is reached)
+			path.add(currentVertex);
+			currentVertex = currentVertex.lastVertex;
+		}
+		return new Path(path, knownVertices.get(knownVertices.indexOf(b)).pathCost);
 
 	}
 }
