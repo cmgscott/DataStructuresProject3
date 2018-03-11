@@ -1,6 +1,6 @@
+// Christin Scott
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 
 /**
  * Representation of a graph vertex

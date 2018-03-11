@@ -1,0 +1,110 @@
+Results
+SEA -> DEN -> MKC -> IND -> ORD
+Path cost: 546
+----------------------------------------------------
+Results
+ORD -> IND -> MKC -> DEN
+Path cost: 291
+----------------------------------------------------
+Results
+ORD -> IND -> MKC
+Path cost: 158
+----------------------------------------------------
+Results
+JFK -> IAD -> ATL -> IAH
+Path cost: 345
+----------------------------------------------------
+Results
+ATL -> IAH -> LAX -> SFO
+Path cost: 597
+----------------------------------------------------Results
+ATL -> IND -> ORD
+Path cost: 167
+----------------------------------------------------
+Results
+ATL -> IND -> ORD
+Path cost: 167
+----------------------------------------------------
+Results
+ATL -> IND
+Path cost: 122
+----------------------------------------------------
+Results
+SEA -> DEN -> MKC -> IND -> ATL
+Path cost: 621
+----------------------------------------------------
+Results
+Source: SEA Destination: ORD
+SEA -> DEN -> MKC -> IND -> ORD
+Path cost: 546
+----------------------------------------------------
+Results
+Source: ATL Destination: IAD
+ATL -> IAD
+Path cost: 143
+----------------------------------------------------
+Results
+Source: ATL Destination: IAD
+ATL -> IAD
+Path cost: 143
+----------------------------------------------------
+Results
+Source: ATL Destination: IAD
+ATL -> IAD
+Path cost: 143
+----------------------------------------------------
+Results
+Source: ATL Destination: IAD
+ATL -> IAD
+Path cost: 143
+----------------------------------------------------
+Results
+Source: ORD Destination: DEN
+ORD -> IND -> MKC -> DEN
+Path cost: 291
+----------------------------------------------------
+Results
+Source: IAD Destination: IAH
+IAD -> ATL -> IAH
+Path cost: 299
+----------------------------------------------------
+Results
+Source: ATL Destination: ATL
+ATL
+Path cost: 0
+----------------------------------------------------
+Results
+Source: ORD Destination: DEN
+ORD -> IND -> MKC -> DEN
+Path cost: 291
+----------------------------------------------------
+Results
+Source: MKC Destination: LAX
+LAX
+Path cost: 2147483647
+----------------------------------------------------
+Results
+Source: ATL Destination: IAD
+ATL -> IAD
+Path cost: 143
+----------------------------------------------------
+Results
+Source: SEA Destination: IAD
+SEA -> DEN -> MKC -> IND -> ATL -> IAD
+Path cost: 764
+----------------------------------------------------
+Results
+Source: ORD Destination: SEA
+ORD -> IND -> MKC -> DEN -> SEA
+Path cost: 541
+----------------------------------------------------
+Results
+Source: IND Destination: IAH
+IND -> MKC -> IAH
+Path cost: 285
+----------------------------------------------------
+Results
+Source: MKC Destination: ATL
+MKC -> IND -> ATL
+Path cost: 230
+----------------------------------------------------

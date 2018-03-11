@@ -1,3 +1,4 @@
+// Christin Scott
 import java.util.*;
 
 /**
@@ -5,17 +6,17 @@ import java.util.*;
  * in the graph.
  */
 public class MyGraph implements Graph {
-	// you will need some private fields to represent the graph
-	// you are also likely to want some private helper methods
 
-	// YOUR CODE HERE
 	/** value of infinity **/
-	public static final int INFINITY = Integer.MAX_VALUE;
+	private static final int INFINITY = Integer.MAX_VALUE;
 	/** the collection of vertices **/
 	ArrayList<Vertex> vertices;
 
 	/** the collection of edges **/
-	Collection<Edge> edges;
+	ArrayList<Edge> edges;
+	
+	/** adacency matrix **/
+	int[][] adjacencyMatrix;
 
 
 
@@ -30,49 +31,62 @@ public class MyGraph implements Graph {
 	 */
 	public MyGraph(Collection<Vertex> v, Collection<Edge> e) {
 
-		// YOUR CODE HERE
+		if (v == null || e == null) {
+			throw new IllegalArgumentException("null");
+		}
+		
 		vertices = (ArrayList<Vertex>) v;
-		edges = e;
+		edges = (ArrayList<Edge>) e;
 
 		// list implementation of graph builder
 		Vertex startingVertex = vertices.get(0);
 		Vertex currentVertex = startingVertex;
 		int count = 0;
-		Collection<Vertex> visitedVertices = new ArrayList<Vertex>(vertices.size()); // large size req.
+		Collection<Vertex> unknownVertices = new ArrayList<Vertex>(vertices.size());
 		// add all edges to collection for individual vertex
 		while (count < vertices.size()) {
 			currentVertex = vertices.get(count);
-			for (int i = 0; i < e.size(); i++) {
-				if (((ArrayList<Edge>) e).get(i).getSource().getLabel().equals(currentVertex.getLabel())) {
+			for (int i = 0; i < edges.size(); i++) {
+				if (!vertices.contains(edges.get(i).getSource()) 
+						|| !vertices.contains(edges.get(i).getDestination())) {
+					throw new IllegalArgumentException("Edge contains vertex not in list of vertices");
+				}
+				if (edges.get(i).getWeight() < 0) {
+					throw new IllegalArgumentException("Weight of path is negative");
+				}
+				if (edges.get(i).getSource().getLabel().equals(currentVertex.getLabel())) {
+//					if (!visitedVertices.contains(currentVertex)) {
 					currentVertex.addEdge(((ArrayList<Edge>) e).get(i));
-					visitedVertices.add(currentVertex);
+					unknownVertices.add(currentVertex);
+//					}
 				}
 			}
 			count++;
 		}
-
+		
 		// matrix implementation of graph builder
-		Map<String, Vertex> denseGraphMap = new HashMap<String, Vertex>();
+		adjacencyMatrix = new int[vertices.size()][vertices.size()];
 		for (int i = 0; i < vertices.size(); i++) {
-			currentVertex = ((ArrayList<Vertex>) vertices).get(i);
-			denseGraphMap.put(currentVertex.getLabel(), currentVertex);
+			for (int j = 0; j < vertices.size(); j++) {
+				adjacencyMatrix[i][j] = INFINITY;
+			}
 		}
-		// should check that the arguments make sense and throw an appropriate exception otherwise.
-
-		// edges should involve only vertices with labels that are in the vertices of the graph (no edge from or to a 
-		// vertex labeled A if there is no vertex with label A)
-
-		// edge weights are not negative
-
-		// do not throw an exception if the collection of vertices has repeats in it
-		// ignore the second one encountered as redundant information
+		
+		for (int i = 0; i < vertices.size(); i++) {
+			ArrayList<Edge> theEdges = (ArrayList<Edge>) vertices.get(i).getEdges();
+			for (int j = 0; j < theEdges.size(); j++) {
+			int row = vertices.indexOf(theEdges.get(j).getSource());
+			int column = vertices.indexOf(theEdges.get(j).getDestination());
+			adjacencyMatrix[row][column] = theEdges.get(j).getWeight();
+			}
+		}
 
 		// throw an exception if the collection of edges has the same directed edge more than once with a different 
 		// weight
 
 		// do not throw an exception if an edge appears redundantly with the same weight ignore the redundant edge 
 		// information
-
+		
 	}
 
 	/**
@@ -83,7 +97,6 @@ public class MyGraph implements Graph {
 	@Override
 	public Collection<Vertex> vertices() {
 
-		// YOUR CODE HERE
 		return vertices;
 
 	}
@@ -96,7 +109,6 @@ public class MyGraph implements Graph {
 	@Override
 	public Collection<Edge> edges() {
 
-		// YOUR CODE HERE
 		return edges;
 
 	}
@@ -115,7 +127,6 @@ public class MyGraph implements Graph {
 	@Override
 	public Collection<Vertex> adjacentVertices(Vertex v) {
 
-		// YOUR CODE HERE
 		Collection<Edge> edges = v.getEdges();
 		Collection<Vertex> returnVertices = new ArrayList<Vertex>();
 		for (int i = 0; i < edges.size(); i++) {
@@ -169,63 +180,87 @@ public class MyGraph implements Graph {
 	 */
 	public Path shortestPath(Vertex a, Vertex b) {
 
-		// YOUR CODE HERE (you might comment this out this method while doing
-		// Part 1)
+		/** comparator object to compare path costs of two vertices **/
 		VertexComparator comparer = new VertexComparator();
-		ArrayList<Vertex> unknownVertices = new ArrayList<Vertex>();
+		/** list of unknown vertices **/
+		List<Vertex> unknownVertices = new ArrayList<Vertex>();
+		/** list of known vertices. the intersection of known and unknown should be disjoint **/
 		List<Vertex> knownVertices = new ArrayList<Vertex>();
+		/** the current vertex being analyzed **/
 		Vertex currentVertex = vertices.get(vertices.indexOf(a));
+		/** current edge of vertex being evaluated **/
 		Edge currentEdge = new Edge(currentVertex, currentVertex, 0);
-
-		//		List<Path> paths = new ArrayList<Path>(vertices.size());
+		/** list of vertices on path to be passed to Path constructor **/
 		List<Vertex> path = new LinkedList<Vertex>();
-		int count = 0;
+
+		// see initial vertex path to 0
 		currentVertex.setPathCost(0);
 
+		// loop to set all other vertices to virtual infinity
+		// adds vertex to list of unknown vertices
 		for (int i = 0; i < vertices.size(); i++) {
 			if (!vertices.get(i).equals(a)) {
-				vertices.get(i).setPathCost(10000); // set path to large num to simulate infinte distance
-				unknownVertices.add(vertices.get(i)); // add vertex to unknown vertices
+				vertices.get(i).setPathCost(INFINITY);
+				unknownVertices.add(vertices.get(i));
 			}
 		}
-		boolean quit = false;
 		while (!unknownVertices.isEmpty()) { // while there are vertices w/ unknown distances
 			if (currentVertex != null) {
-				for (int i = 0; i < currentVertex.getEdges().size(); i++) { // iterate through all the vertex's edges
+				// iterate through all the vertex's edges
+				for (int i = 0; i < currentVertex.getEdges().size(); i++) { 
 					currentEdge = ((ArrayList<Edge>) currentVertex.getEdges()).get(i);
-					int tempPath = currentVertex.getPathCost() + currentEdge.getWeight(); // the current total path cost of the vertex + the cost to the destination vertex of the edge at index i
-//					if (currentVertex.equals(a)) {
-//						currentVertex.pathCost = 0;
-//						tempPath = 0 + currentEdge.getWeight();
-//				    }
-					if (unknownVertices.indexOf(currentEdge.getDestination()) >= 0 && tempPath < unknownVertices.get(unknownVertices.indexOf(currentEdge.getDestination())).getPathCost()) { // if the temp path to the destination vertex is less than it's current path cost (initially infinity)
+					// the current total path cost of the vertex + the cost to the 
+					// destination vertex of the edge at index i
+					int tempPath = currentVertex.getPathCost() + currentEdge.getWeight(); 
+					// if the temp path to the destination vertex is less than it's current 
+					// path cost (initially infinity)
+					if (unknownVertices.indexOf(currentEdge.getDestination()) >= 0 
+							&& tempPath < unknownVertices.get(
+									unknownVertices.indexOf(currentEdge.getDestination())).getPathCost()) { 
 						if (!currentEdge.getDestination().equals(a)) { // don't want to circle back
-							System.out.println("the temp path from " + currentVertex.getLabel() + " to " + currentEdge.getDestination() + " is: " + tempPath);
-							int indexOfDest = unknownVertices.indexOf(currentEdge.getDestination()); // index of the destination vertex
-							if (indexOfDest >= 0) { // is -1 if destination is a known vertex
-							unknownVertices.get(indexOfDest).pathCost = tempPath; // set new path cost to destination
-							unknownVertices.get(indexOfDest).lastVertex = currentVertex; // set the previous vertex in the destination vertex
+							// index of the destination vertex
+							int indexOfDest = unknownVertices.indexOf(currentEdge.getDestination()); 
+							// is -1 if destination is a known vertex
+							if (indexOfDest >= 0) { 
+								// set new path cost to destination
+								unknownVertices.get(indexOfDest).pathCost = tempPath; 
+								// set the previous vertex in the destination vertex
+								unknownVertices.get(indexOfDest).lastVertex = currentVertex; 
 							} 
 						}
 					}
 				}
 			}
-			unknownVertices.sort(comparer); // sorts the array so that the least path is at index 0
-//			if (b.equals(currentVertex)) { // if the destination becomes a known vertex, it's path is certain
-//				break; // so the loop can end
-//			}
-			unknownVertices.remove(currentVertex); // the vertex is no longer unknown
+			unknownVertices.sort(comparer);
+			// the vertex is no longer unknown
+			unknownVertices.remove(currentVertex); 
+			// the vertex is known
 			knownVertices.add(currentVertex);
+			// sets next vertex to lowest path cost from source as long as there are vertices to be evaluated
 			if (!unknownVertices.isEmpty())
-			currentVertex = unknownVertices.get(0); // next lowest path cost unknown vertex
+				currentVertex = unknownVertices.get(0); 
 		}
 
 		currentVertex = knownVertices.get(knownVertices.indexOf(b));
-		while (currentVertex != null) { // iterate through last vertices until null (or until starting node is reached)
+		// iterate through last vertices until null (or until starting node is reached)
+		while (currentVertex != null) { 
 			path.add(currentVertex);
 			currentVertex = currentVertex.lastVertex;
 		}
+		Collections.reverse(path);
+		if (knownVertices.get(knownVertices.indexOf(b)).pathCost + 100000 < 0) {
+//			throw new IllegalArgumentException("Vertices are unconnected");
+			return null;
+		}
+		resetVertices();
 		return new Path(path, knownVertices.get(knownVertices.indexOf(b)).pathCost);
 
+	}
+
+	private void resetVertices() {
+		for (int i = 0; i < vertices.size(); i++) {
+			vertices.get(i).setLastVertex(vertices.get(i));
+		}
+		
 	}
 }

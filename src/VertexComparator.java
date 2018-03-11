@@ -10,7 +10,6 @@ public class VertexComparator implements Comparator<Vertex> {
 
 	@Override
 	public int compare(Vertex arg0, Vertex arg1) {
-		// TODO Auto-generated method stub
 		int pathCostArg0 = arg0.getPathCost();
 		int pathCostArg1 = arg1.getPathCost();
 		if (pathCostArg0 == pathCostArg1) {
@@ -22,5 +21,9 @@ public class VertexComparator implements Comparator<Vertex> {
 		}
 		return Integer.getInteger(null);
 	}
-
 }
+
+
+
+
+
